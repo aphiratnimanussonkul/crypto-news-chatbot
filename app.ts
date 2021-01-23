@@ -1,13 +1,14 @@
-import { addNews } from "./services/news";
 import { getNews } from "./services/crypto.panic";
+import { getNewsByCurrency } from "./services/news";
 
 var express = require("express");
 const app = express();
 const port = 3000;
 
-app.get("/", (req, res) => {
-  addNews();
-  res.send("Hello World!");
+app.get("/news/:currency", async (req, res) => {
+  const { currency } = req.params;
+  let data = await getNewsByCurrency(currency);
+  res.status(200).send(data);
 });
 app.post("/get-news/:currency", async (req, res) => {
   const { currency } = req.params;
