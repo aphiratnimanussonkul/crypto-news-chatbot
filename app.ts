@@ -9,8 +9,9 @@ app.get("/", (req, res) => {
   addNews();
   res.send("Hello World!");
 });
-app.get("/get-news", async (req, res) => {
-  let data = await getNews();
+app.post("/get-news/:currency", async (req, res) => {
+  const { currency } = req.params;
+  let data = await getNews(currency);
   res.status(200).send(data);
 });
 
