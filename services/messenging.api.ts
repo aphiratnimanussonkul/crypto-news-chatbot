@@ -10,19 +10,25 @@ export const sendMessageToUser = async (
   message: string,
   receiveId: number
 ): Promise<any> => {
-  let messageRequest: MessageRequest = {
-    messaging_type: MessageType.UPDATE,
-    message: {
-      text: message,
-    },
-    recipient: {
-      id: receiveId,
-    },
-  };
+  try {
+    console.log("on try to send message to user");
+    let messageRequest: MessageRequest = {
+      messaging_type: MessageType.UPDATE,
+      message: {
+        text: message,
+      },
+      recipient: {
+        id: receiveId,
+      },
+    };
 
-  return await httpClient.post(`${config.baseUrl}`, messageRequest, {
-    params: {
-      access_token: config.pageAccessToken,
-    },
-  });
+    return await httpClient.post(`${config.baseUrl}`, messageRequest, {
+      params: {
+        access_token: config.pageAccessToken,
+      },
+    });
+  } catch (error) {
+    console.log("error when try to send message to user");
+    console.log(error);
+  }
 };
