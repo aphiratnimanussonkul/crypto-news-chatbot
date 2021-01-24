@@ -36,22 +36,36 @@ export const getNewsById = async (news: News) => {
   }
 };
 
-export const getNewsByCurrency = async (currencyCode: string) => {
+export const getNewsByCurrency = async (
+  currencyCode: string
+): Promise<News> => {
   try {
     let getNewsResult = [];
     await firestore
       .collection("news")
+      .limit(5)
       .get()
       .then((result) => {
         result.docs.map((data) => {
           getNewsResult.push(data.data());
         });
       });
-    return getNewsResult.filter((news: News) =>
-      news.currencies.find(
-        (currency: Currency) => currency.code == currencyCode
-      )
-    );
+    getNewsResult = getNewsResult
+      .reverse()
+      .filter((news: News) =>
+        news.currencies.find(
+          (currency: Currency) => currency.code == currencyCode
+        )
+      );
+    if (getNewsResult[0]) {
+      return getNewsResult[0];
+    }
+    return {
+      title: "ยังไม่มีข่าวใหม่เกี่ยวกับเหรียญ " + currencyCode,
+      currencies: [],
+      id: null,
+      url: "",
+    };
   } catch (error) {
     console.log(error);
     return null;
