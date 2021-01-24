@@ -12,6 +12,7 @@
     "express": "~4.16.1",
     "firebase": "^8.2.4",
     "http-errors": "~1.6.3",
+    "node-url-shortener": "^1.1.11",
     "ts-node-dev": "^1.1.1",
     "typescript": "^4.1.3"
   }

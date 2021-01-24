@@ -1,12 +1,16 @@
 import firebase from "../firebase/index";
 import { News } from "../models/news";
 import { Currency } from "../models/news.response";
+var shortUrl = require("node-url-shortener");
 
 const { firestore } = firebase;
 
 export const saveNewsToDB = async (news: News) => {
   try {
-    await firestore.collection("news").doc(news.id.toString()).set(news);
+    shortUrl.short(news.url, async function (err, url) {
+      news.url = url;
+      await firestore.collection("news").doc(news.id.toString()).set(news);
+    });
   } catch (error) {
     console.log(error);
     return null;
