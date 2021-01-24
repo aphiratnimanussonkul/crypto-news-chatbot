@@ -13,7 +13,7 @@ export const getAllNewsFromCryptoPanic = async (): Promise<NewsResponse> => {
       kind: "news",
     },
   });
-  let result = response.data.results as NewsResponse;
+  let result = response.data as NewsResponse;
   return result;
 };
 
