@@ -14,7 +14,7 @@ export const sendLastNewsToUser = async (news: News) => {
   if (user) {
     news.currencies.forEach((currency) => {
       if (user.favoriteCoin == currency.code) {
-        let message = `${news.url} \n ${news.url}`;
+        let message = `${news.title} \n ${news.url}`;
         sendMessageToUser(message, user.id);
       }
     });
