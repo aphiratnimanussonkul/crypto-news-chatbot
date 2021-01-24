@@ -1,4 +1,7 @@
-import { getNews } from "./services/crypto.panic";
+import {
+  getNewsFromCryptoPanic,
+  getAllNewsFromCryptoPanic,
+} from "./services/crypto.panic";
 import { getNewsByCurrency } from "./services/news";
 
 var express = require("express");
@@ -10,9 +13,16 @@ app.get("/news/:currency", async (req, res) => {
   let data = await getNewsByCurrency(currency);
   res.status(200).send(data);
 });
+
 app.post("/get-news/:currency", async (req, res) => {
   const { currency } = req.params;
-  let data = await getNews(currency);
+  let data = await getNewsFromCryptoPanic(currency);
+  res.status(200).send(data);
+});
+
+app.post("/get-news", async (req, res) => {
+  const { currency } = req.params;
+  let data = await getAllNewsFromCryptoPanic();
   res.status(200).send(data);
 });
 
