@@ -9,6 +9,7 @@ export const saveNewsToDB = async (news: News) => {
     await firestore.collection("news").doc(news.id.toString()).set(news);
   } catch (error) {
     console.log(error);
+    return null;
   }
 };
 
