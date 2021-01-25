@@ -56,8 +56,23 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
       var favorite =
         parseData.originalDetectIntentRequest.payload.data.postback.payload;
       var sender = parseData.originalDetectIntentRequest.payload.data.sender.id;
+      console.log(`Sender id = ${sender}`);
+
+      saveFavorite(favorite);
       agent.add(`Your is ${favorite} in favorite`);
     }
+
+    function saveFavorite(curreny) {
+      return db
+        .collection("users")
+        .doc("bb1SMPu9BnxZemoxEzHd")
+        .set({
+          favoriteCoin: curreny,
+          id: 2640677152657766,
+        })
+        .then(() => {});
+    }
+
     function bitcoinprice(agent) {
       return fetch(url, requestOptions)
         .then((res) => res.json())
@@ -231,30 +246,33 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
 
     async function getLastNews(agent, currency) {
       try {
-        let getNewsResult = [];
-        await db
+        return db
           .collection("news")
           .limit(5)
           .get()
           .then((result) => {
+            let getNewsResult = [];
             result.docs.map((data) => {
               getNewsResult.push(data.data());
             });
+            getNewsResult = getNewsResult
+              .reverse()
+              .filter((news) =>
+                news.currencies.find((cur) => cur.code == currency)
+              );
+            if (getNewsResult[0]) {
+              console.log(getNewsResult[0]);
+              agent.add(`${getNewsResult[0].title} ${getNewsResult[0].url}`);
+            } else {
+              agent.add(`ยังไม่มีข่าวใหม่เกี่ยวกับเหรียญ ${currency}`);
+            }
           });
-        getNewsResult = getNewsResult
-          .reverse()
-          .filter((news) =>
-            news.currencies.find((cur) => cur.code == currency)
-          );
-        if (getNewsResult[0]) {
-          agent.add(`${getNewsResult[0].title} ${getNewsResult[0].url}`);
-        }
-        agent.add(`ยังไม่มีข่าวใหม่เกี่ยวกับเหรียญ ${currency}`);
       } catch (error) {
-        console.log(error);
-        agent.add("error");
+        console.log("error when get data from fb", error);
+        return null;
       }
     }
+
     async function ethereumnews(agent) {
       await getLastNews(agent, "ETH");
     }
