@@ -11,7 +11,7 @@ import { sendMessageToUser } from "../services/messenging.api";
 
 export const sendLastNewsToUser = async (news: News) => {
   let user: UserInfo = await getUserInfo();
-  if (user) {
+  if (user && news?.currencies) {
     news.currencies.forEach((currency) => {
       if (user.favoriteCoin == currency.code) {
         let message = `${news.title} \n ${news.url}`;

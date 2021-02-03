@@ -4,5 +4,5 @@ export interface News {
   title: string;
   url: string;
   id: number;
-  currencies: Currency[];
+  currencies?: Currency[];
 }

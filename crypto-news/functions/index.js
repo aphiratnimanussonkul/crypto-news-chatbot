@@ -1,8 +1,7 @@
 "use strict";
 const fetch = require("node-fetch");
-const { WebhookClient } = require("dialogflow-fulfillment");
+const { WebhookClient, Payload, Platforms } = require("dialogflow-fulfillment");
 // @ts-ignore
-const { Card, Suggestion } = require("dialogflow-fulfillment");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
@@ -10,20 +9,20 @@ admin.initializeApp({
   credential: admin.credential.cert({
     // @ts-ignore
     type: "service_account",
-    project_id: "crypto-news-chatbot",
-    private_key_id: "6e2a49a5dd197685a00fe1be99589e9b604b2878",
+    project_id: "kittitorn-fmefkd",
+    private_key_id: "d92340f0a74c6687f421636442371bfb6e28fdaf",
     private_key:
-      "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC/yeMP0ryr6QlN\nTP3VbNgNoD/bfMlwuFeyGRCAau6NbGh+CF1sr6R0eDEFQfZ4twn8Jw+VpAPTYRsD\nnxFuBLD0XT14Cp88VN7Q3RVoNWv+UOGwJwxObbsOyRX+5/imWvpr5jPVaE+8q9Qs\n8i6/DR9HMW+3jaxaEh+9BnS8HV6ICTRBV2hWzkcRh/4vloM+Cq72LplE9HA4/x3x\ngeqPL9XZSOYqHK1UP+dQtEur7IK8rayttcMFHwURKggrMtw7n/5nXOVccgoJQmf8\nAuysiLvNhAYc20ag+etxUa86HIWszQqBbMMRQaG0Z8VOcEwcm3eRLPInDZ9dB5iy\nQYc5khk5AgMBAAECggEAHufIwWvV/8/cMgrg8UEKaduzyUnzvh3T8pJWaz3lYNXM\n2tkR5lSW0uFBaQBRrZngBTRC2dF7KldraSsmEw1feelX4Uhjk5nLlBW5quLHmyJB\nKXKJaaQGG40COzhPWc4EV68vasmAkT3mlt2UnzCH+fV4nrgOQ4TIfNyVosYKzdnX\nNGgk0OyXVGabOp7xUYWxBubi4re2EMbmk/u+s4SNG3ZltVvkFXcPkN5ZQHziN3Zc\nEdgNi8gex76WPoNj0FTxdAybZIQq+07wTa76qgQH3H/ANhg6pmfvJQAIips+pu9X\nS3OtJMQiDScUuAQlhqC3XoZ1hDPFRyKcXZM7x/wZtwKBgQD7PctqPSrlTuYDTF9I\nAdnKvb79vPnhGpF6IzN2J4gF0EcAGVgqV5RJWwLNikP1Qvz3zqS8z1hhROJtdKdv\nV78VO2xm371w+zMhl4FjbboPtlC2G/wpVEZWL3yAfULSVT3zlnxfI5HksEPWt1Fo\nw2D0+spBXjU7J8kP9Xt4Onek/wKBgQDDa9IyHl8T/SSOdVI+r6sim/YmzXEOVE27\nEk4t9rRsOXv6VBGpmwnIV4nGlx/ocAQ11Hl2j44CKl9aLJ//Y/BhqMbPVZZ/0Sxo\ny4V1bMAfcUJhh2yKL0midjVIdzJJB+mx6qURl8mdj6xyD3dHs5+mUO66G/R6hQXC\nQGfDLtwpxwKBgQDlO5ihsnW1C6vqToCRHr8ssLvWn9oOfUNHAV8u6xq80zA08ury\nlz4BQDzqdMFUwm41XCIK89Rby5Ic9FbgzFrYcIOTyYj70PbyK14u7irZsyspPZdx\nzibu9BzQz3lsl8ISwrdvxvCSjBEZk+F/iOSqITjxM5e2BbL6EK07IX2Q2QKBgBC2\nlvqMWGtYOhko9YjA82z5U7sL1QB5u1Alh6Qstk+PNwg4ym3sAZEt0221nRf/BI0q\nB91Y97c9snv+1ww7muJvUdmHo2B5Hkg0J8zcKS5HPHsk3uaOlsibPYFeGGHgmF8M\nB2QSzD56fDAhHH14Yk4SG+i03VrhJ5XudjFeP5wfAoGAYEkuoLq7rZIJM1syOwcw\nMmoa7Su5tJdPBSOdZFizG3VEjBClqJQCtpd3IGap+ocbV+m9r5+N4HWSFv0e18Cw\nLJU9YnHzepbrgr/ZTP0NhM8+3+S7u9sOrZt2wz3wYILAkT6VAhT6Tsy4reEwqEg5\ncE7eouviLxqaOBV/YmgHcmA=\n-----END PRIVATE KEY-----\n",
+      "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDsln1R6MiIquoc\npmxmzcVzd5QXIodovmd/jUk75LeAgXr9Rei8SBM9Z4z6Le4gnRWJ+JoYcuVrZ8ZW\nmx0A7XMsGpQfTXP4nKvgFKNNnpxa+cFNie7QeHbBCsV7VUHsT/IgWwxY+FsLcuGk\nucAGwckXPUTC2nB7ZMmZocVsrAu/+C4iQ6Y5EmBa1kQZClgJDWVTSvY5GGx1eFN6\n9s9OeXps4IGC2GPaFV2dCdIXrtodNI1qJ4JPIEjdMsHkcye12OlrXz3835IzQe8K\nrkAl3rS6YkDq6sIFvoU9xLENdnBDF5pL5+DEdU7Oqq9WMUqj0oQiWDf80w/tdiCu\nlhNH/P+PAgMBAAECggEACCteInDuU8HLGbgpcBdU5RrQ80eO82/3tPDVAYtxRq+x\n5oL+eVnnyCwGMzFY0ql57+y0rXlyMJZBxAXRJ5ILcw9r4/TRt1j5mmA8D1cVwRJ0\nuU+0/l/agen0TcDw6M8N5k4ejAfvZOLPpdeAKPuSDQphkHTog2pEh9iNL6Z1NWi0\nd1nupYdTPZ5nJRsWp/WijuwX9CcbjSaT5YQFh8nETB4dXPn+nTbSMjZRwA7fVA46\n8nViBTwavFnTYx+ongiZz7BtOh8oG0LqFXvKZ6BAQCxEx1fu7zkMNw4ZxxcmIjBX\nrja8cPOxQVTcVatuYPVdQJRdzF0xWOeWy+EVLxjTgQKBgQD6sSIzfe6LxOlXu6X3\nXjICBODYIRAGBkXdA7Xq5IFbtv2zcPNlEHnC5cOLOlpcD0VcAnN390UjXM7OzvfQ\ntrai8nr/qcpyFO1Zq2M6fFSe4Z234XIKWUf6+NChceytiGjCk9aoO7PTq/htME3l\n12ch53ZJm6u5AzuF1/cQywotTwKBgQDxmOfBTNja7UwzWWgGRpiWCTjPN+1Ip0rH\nc8GCW1ezQW9AM62cWIwsTY7oIw6mrJWZLNdk4sImPexLNp86wBlbJCJ4onPI2jov\nveEJkxEOchr3t2BAT10mmGc9g61ek3z4PGAbfyAHhRnq+35BWLj2isqVuHyN/tMh\nSj9poxH5wQKBgHX99TkDJsnGToWqnn0Fasgkf6d6OE59mVhjLLZ4AqKmSFay7Pw+\nevDOr/DR8EGwNlcOGEb4rSPtxLD2HRGxTdj4BAhdZBm529T+o9+dMT7utgscI07X\notdvUNMMCffLYnNinf/kycjxAiZyO9fYQIRmqvgOOw8DhHqEoZbX2dxlAoGAPvbS\nr5YPjj759QgADGKpsbCFlbvFo4G2A3UvoYGcwaL0E49kV7LcFU/BRs6cKuQfuOPu\n3uQaJU1OH+wEY5NdCFvKgBYWhuoY8AhUdeJWN6WVUaoA88G7TSu6/FUtAdD+aNOT\nWJcxCcSulIcmyHEPA3H4ijyieX9IFwz6qdVOAgECgYEA+qeLoDwDVPvsSDZMhnQA\nJW2lC/MfyLfdYkgrRmgpRCdxdhSvES35NywiZ4Q4ZXdgSuDpSpE5i3gbO9uqq6VP\nohfCRMK8tPzQAXbX0r94B6mzwB1CtsteAUiabgA9GCLA44uJzbDqSsEpg/p63bNr\n6FL1GSn7091thdxn3dQ8fU0=\n-----END PRIVATE KEY-----\n",
     client_email:
-      "firebase-adminsdk-y233u@crypto-news-chatbot.iam.gserviceaccount.com",
-    client_id: "113647215053630451095",
+      "firebase-adminsdk-7h93i@kittitorn-fmefkd.iam.gserviceaccount.com",
+    client_id: "113196491205536285035",
     auth_uri: "https://accounts.google.com/o/oauth2/auth",
     token_uri: "https://oauth2.googleapis.com/token",
     auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
     client_x509_cert_url:
-      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-y233u%40crypto-news-chatbot.iam.gserviceaccount.com",
+      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-7h93i%40kittitorn-fmefkd.iam.gserviceaccount.com",
   }),
-  databaseURL: "https://crypto-news-chatbot.firebaseio.com",
+  databaseURL: "https://kittitorn-fmefkd.firebaseio.com",
 });
 
 const db = admin.firestore();
@@ -53,7 +52,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
     );
     console.log("Dialogflow Request body: " + JSON.stringify(request.body));
 
-    function select(agent) {
+    async function select(agent) {
       var my = JSON.stringify(request.body);
       var parseData = JSON.parse(my);
       var favorite =
@@ -61,11 +60,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
       var sender = parseData.originalDetectIntentRequest.payload.data.sender.id;
       console.log(`Sender id = ${sender}`);
 
-      saveFavorite(favorite);
-      agent.add(`Your is ${favorite} in favorite`);
+      await saveFavorite(agent, favorite);
     }
 
-    function saveFavorite(curreny) {
+    async function saveFavorite(agent, curreny) {
       return db
         .collection("users")
         .doc("bb1SMPu9BnxZemoxEzHd")
@@ -73,7 +71,9 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
           favoriteCoin: curreny,
           id: 2640677152657766,
         })
-        .then(() => {});
+        .then(() => {
+          agent.add(`Your is ${curreny} in favorite`);
+        });
     }
 
     function bitcoinprice(agent) {
@@ -273,8 +273,13 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
               .filter((news) =>
                 news.currencies.find((cur) => cur.code == currency)
               );
-            if (getNewsResult[0]) {
-              agent.add(`${getNewsResult[0].title} ${getNewsResult[0].url}`);
+            if (getNewsResult.length) {
+              let lastNewIndex =
+                getNewsResult.length >= 5 ? 5 : getNewsResult.length;
+              for (let i = 0; i < lastNewIndex; i++) {
+                let message = `${getNewsResult[i].title} \n ${getNewsResult[i].url}`;
+                agent.add(message);
+              }
             } else {
               agent.add(`ยังไม่มีข่าวใหม่เกี่ยวกับเหรียญ ${currency}`);
             }
@@ -325,6 +330,25 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
       await getLastNews(agent, "BNB");
     }
 
+    async function showMyFavorite(agent) {
+      return db
+        .collection("users")
+        .doc("bb1SMPu9BnxZemoxEzHd")
+        .get()
+        .then((result) => {
+          let data = result.data();
+          let favorite = "เหรียญที่คุณสนใจคือ \n";
+          if (data.favoriteCoins) {
+            data.favoriteCoins.forEach((coin) => {
+              favorite = `${favorite}${coin}\n`;
+            });
+            agent.add(favorite);
+          } else {
+            agent.add("คุณยังไม่มีเหรียญที่สนใจ");
+          }
+        });
+    }
+
     let intentMap = new Map();
     intentMap.set("NewsETH", ethereumnews);
     intentMap.set("NewsBTC", bitcoinnews);
@@ -347,10 +371,195 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
     intentMap.set("PriceLINK", chainlinkprice);
     intentMap.set("PriceBNB", binancecoinprice);
     intentMap.set("Select", select);
+    intentMap.set("ติดตาม", showMyFavorite);
+    intentMap.set("เหรียญของฉัน", showMyFavorite);
     // intentMap.set('your intent name here', yourFunctionHandler);
     // intentMap.set('your intent name here', googleAssistantHandler);
     agent.handleRequest(intentMap);
+
+    function getFavoriteCoinCard(currency) {
+      switch (currency) {
+        case "ETH":
+          return {
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                type: "postback",
+                payload: "เลิกติดตาม ETH",
+              },
+            ],
+            image_url:
+              "https://satang.zendesk.com/hc/article_attachments/360052756911/mceclip0.png",
+            default_action: {
+              type: "web_url",
+              url: "https://www.google.com/",
+              webview_height_ratio: "tall",
+            },
+            title: "ETH",
+          };
+        case "BTC":
+          return {
+            default_action: {
+              url: "https://www.google.com/",
+              webview_height_ratio: "tall",
+              type: "web_url",
+            },
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                type: "postback",
+                payload: "เลิกติดตาม BTC",
+              },
+            ],
+            title: "BTC",
+            image_url:
+              "https://logos-world.net/wp-content/uploads/2020/08/Bitcoin-Logo-700x394.png",
+          };
+        case "USDT":
+          return {
+            default_action: {
+              url: "https://www.google.com/",
+              webview_height_ratio: "tall",
+              type: "web_url",
+            },
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                type: "postback",
+                payload: "เลิกติดตาม USDT",
+              },
+            ],
+            image_url:
+              "https://www.coin-report.net/en/wp-content/uploads/sites/11/2018/01/tether-coin.png",
+            title: "USDT",
+          };
+        case "DOT":
+          return {
+            image_url:
+              "https://research.binance.com/static/images/projects/polkadot/logo.png",
+            default_action: {
+              url: "https://www.google.com/",
+              type: "web_url",
+              webview_height_ratio: "tall",
+            },
+            title: "DOT",
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                payload: "เลิกติดตาม DOT",
+                type: "postback",
+              },
+            ],
+          };
+        case "XRP":
+          return {
+            title: "XRP",
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                type: "postback",
+                payload: "เลิกติดตาม XRP",
+              },
+            ],
+            image_url:
+              "https://www.netclipart.com/pp/m/176-1761401_ripple-xrp-new-logo-png.png",
+            default_action: {
+              webview_height_ratio: "tall",
+              type: "web_url",
+              url: "https://www.google.com/",
+            },
+          };
+        case "BCH":
+          return {
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                type: "postback",
+                payload: "เลิกติดตาม BCH",
+              },
+            ],
+            default_action: {
+              webview_height_ratio: "tall",
+              type: "web_url",
+              url: "https://www.google.com/",
+            },
+            image_url:
+              "https://www.pngitem.com/pimgs/m/650-6504368_bitcoin-cash-bch-logo-hd-png-download.png",
+            title: "BCH",
+          };
+        case "LINK":
+          return {
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                type: "postback",
+                payload: "เลิกติดตาม LINK",
+              },
+            ],
+            title: "LINK",
+            image_url:
+              "https://blockspaper-prod.oss-ap-southeast-1.aliyuncs.com/20200828e1a6c1a79bf98c48.jpg",
+            default_action: {
+              type: "web_url",
+              url: "https://www.google.com/",
+              webview_height_ratio: "tall",
+            },
+          };
+        case "BNB":
+          return {
+            image_url:
+              "https://bitcoinaddict.org/wp-content/uploads/2019/12/12-19-2019-10-35-45-AM.png",
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                payload: "เลิกติดตาม BNB",
+                type: "postback",
+              },
+            ],
+            default_action: {
+              webview_height_ratio: "tall",
+              type: "web_url",
+              url: "https://www.google.com/",
+            },
+            title: "BNB",
+          };
+        case "LTC":
+          return {
+            default_action: {
+              url: "https://www.google.com/",
+              type: "web_url",
+              webview_height_ratio: "tall",
+            },
+            title: "LTC",
+            buttons: [
+              {
+                title: "เลิกติดตาม",
+                payload: "เลิกติดตาม LTC",
+                type: "postback",
+              },
+            ],
+            image_url:
+              "https://play-lh.googleusercontent.com/Xg4CyE2Wr-GAYMN88ppBrvYT70UGhi7F7Zd2GqATrvExBy6aByd_OCBruH65B3MHWQ",
+          };
+        case "ADA":
+          return {
+            buttons: [
+              {
+                payload: "เลิกติดตาม ADA",
+                title: "เลิกติดตาม",
+                type: "postback",
+              },
+            ],
+            title: "ADA",
+            image_url:
+              "https://essentialbinaryoptions.com/wp-content/uploads/2019/10/ada.png",
+            default_action: {
+              webview_height_ratio: "tall",
+              type: "web_url",
+              url: "https://www.google.com/",
+            },
+          };
+      }
+    }
   }
 );
-
-

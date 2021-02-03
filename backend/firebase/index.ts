@@ -1,9 +1,9 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 const config = {
-  apiKey: "d1e8d7ba65b37e78ef124f543488065100b51108",
-  databaseURL: "https://crypto-news-chatbot.firebaseio.com",
-  projectId: "crypto-news-chatbot",
+  apiKey: "d92340f0a74c6687f421636442371bfb6e28fdaf",
+  databaseURL: "https://kittitorn-fmefkd.firebaseio.com",
+  projectId: "kittitorn-fmefkd",
   // appId: "<Your APP ID>",
 };
 
