@@ -67,12 +67,38 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
       return db
         .collection("users")
         .doc("bb1SMPu9BnxZemoxEzHd")
-        .set({
-          favoriteCoin: curreny,
-          id: 2640677152657766,
-        })
-        .then(() => {
-          agent.add(`Your is ${curreny} in favorite`);
+        .get()
+        .then((user) => {
+          try {
+            const { favoriteCoins } = user.data();
+            if (favoriteCoins.find((coin) => coin == curreny)) {
+              agent.add("คุณได้ติดตามเหรียญนี้แล้ว");
+            } else {
+              console.log(favoriteCoins);
+              favoriteCoins.push(curreny);
+              return db
+                .collection("users")
+                .doc("bb1SMPu9BnxZemoxEzHd")
+                .set({
+                  favoriteCoins: favoriteCoins,
+                  id: 2640677152657766,
+                })
+                .then(() => {
+                  agent.add(`คุณกำลังติดตามเหรียญ ${curreny}`);
+                });
+            }
+          } catch (error) {
+            return db
+              .collection("users")
+              .doc("bb1SMPu9BnxZemoxEzHd")
+              .set({
+                favoriteCoins: [curreny],
+                id: 2640677152657766,
+              })
+              .then(() => {
+                agent.add(`คุณกำลังติดตามเหรียญ ${curreny}`);
+              });
+          }
         });
     }
 
@@ -376,190 +402,5 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
     // intentMap.set('your intent name here', yourFunctionHandler);
     // intentMap.set('your intent name here', googleAssistantHandler);
     agent.handleRequest(intentMap);
-
-    function getFavoriteCoinCard(currency) {
-      switch (currency) {
-        case "ETH":
-          return {
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                type: "postback",
-                payload: "เลิกติดตาม ETH",
-              },
-            ],
-            image_url:
-              "https://satang.zendesk.com/hc/article_attachments/360052756911/mceclip0.png",
-            default_action: {
-              type: "web_url",
-              url: "https://www.google.com/",
-              webview_height_ratio: "tall",
-            },
-            title: "ETH",
-          };
-        case "BTC":
-          return {
-            default_action: {
-              url: "https://www.google.com/",
-              webview_height_ratio: "tall",
-              type: "web_url",
-            },
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                type: "postback",
-                payload: "เลิกติดตาม BTC",
-              },
-            ],
-            title: "BTC",
-            image_url:
-              "https://logos-world.net/wp-content/uploads/2020/08/Bitcoin-Logo-700x394.png",
-          };
-        case "USDT":
-          return {
-            default_action: {
-              url: "https://www.google.com/",
-              webview_height_ratio: "tall",
-              type: "web_url",
-            },
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                type: "postback",
-                payload: "เลิกติดตาม USDT",
-              },
-            ],
-            image_url:
-              "https://www.coin-report.net/en/wp-content/uploads/sites/11/2018/01/tether-coin.png",
-            title: "USDT",
-          };
-        case "DOT":
-          return {
-            image_url:
-              "https://research.binance.com/static/images/projects/polkadot/logo.png",
-            default_action: {
-              url: "https://www.google.com/",
-              type: "web_url",
-              webview_height_ratio: "tall",
-            },
-            title: "DOT",
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                payload: "เลิกติดตาม DOT",
-                type: "postback",
-              },
-            ],
-          };
-        case "XRP":
-          return {
-            title: "XRP",
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                type: "postback",
-                payload: "เลิกติดตาม XRP",
-              },
-            ],
-            image_url:
-              "https://www.netclipart.com/pp/m/176-1761401_ripple-xrp-new-logo-png.png",
-            default_action: {
-              webview_height_ratio: "tall",
-              type: "web_url",
-              url: "https://www.google.com/",
-            },
-          };
-        case "BCH":
-          return {
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                type: "postback",
-                payload: "เลิกติดตาม BCH",
-              },
-            ],
-            default_action: {
-              webview_height_ratio: "tall",
-              type: "web_url",
-              url: "https://www.google.com/",
-            },
-            image_url:
-              "https://www.pngitem.com/pimgs/m/650-6504368_bitcoin-cash-bch-logo-hd-png-download.png",
-            title: "BCH",
-          };
-        case "LINK":
-          return {
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                type: "postback",
-                payload: "เลิกติดตาม LINK",
-              },
-            ],
-            title: "LINK",
-            image_url:
-              "https://blockspaper-prod.oss-ap-southeast-1.aliyuncs.com/20200828e1a6c1a79bf98c48.jpg",
-            default_action: {
-              type: "web_url",
-              url: "https://www.google.com/",
-              webview_height_ratio: "tall",
-            },
-          };
-        case "BNB":
-          return {
-            image_url:
-              "https://bitcoinaddict.org/wp-content/uploads/2019/12/12-19-2019-10-35-45-AM.png",
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                payload: "เลิกติดตาม BNB",
-                type: "postback",
-              },
-            ],
-            default_action: {
-              webview_height_ratio: "tall",
-              type: "web_url",
-              url: "https://www.google.com/",
-            },
-            title: "BNB",
-          };
-        case "LTC":
-          return {
-            default_action: {
-              url: "https://www.google.com/",
-              type: "web_url",
-              webview_height_ratio: "tall",
-            },
-            title: "LTC",
-            buttons: [
-              {
-                title: "เลิกติดตาม",
-                payload: "เลิกติดตาม LTC",
-                type: "postback",
-              },
-            ],
-            image_url:
-              "https://play-lh.googleusercontent.com/Xg4CyE2Wr-GAYMN88ppBrvYT70UGhi7F7Zd2GqATrvExBy6aByd_OCBruH65B3MHWQ",
-          };
-        case "ADA":
-          return {
-            buttons: [
-              {
-                payload: "เลิกติดตาม ADA",
-                title: "เลิกติดตาม",
-                type: "postback",
-              },
-            ],
-            title: "ADA",
-            image_url:
-              "https://essentialbinaryoptions.com/wp-content/uploads/2019/10/ada.png",
-            default_action: {
-              webview_height_ratio: "tall",
-              type: "web_url",
-              url: "https://www.google.com/",
-            },
-          };
-      }
-    }
   }
 );
