@@ -14,7 +14,7 @@ export const getUserInfo = async (): Promise<UserInfo> => {
         getUserResult = {
           id: result.data().id,
           name: result.data().name,
-          favoriteCoin: result.data().favoriteCoin,
+          favoriteCoins: result.data().favoriteCoins,
         };
       });
     return getUserResult;
