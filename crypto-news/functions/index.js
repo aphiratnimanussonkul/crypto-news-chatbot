@@ -75,7 +75,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
           const deleteCoinIndex = favoriteCoins.findIndex(
             (coin) => coin == deleteCoin
           );
-          if (deleteCoinIndex) {
+          if (deleteCoinIndex >= 0) {
             favoriteCoins.splice(deleteCoinIndex, 1);
             return refDB
               .set({
