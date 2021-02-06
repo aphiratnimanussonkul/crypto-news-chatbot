@@ -63,6 +63,37 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
       await saveFavorite(agent, favorite);
     }
 
+    async function deletFavoriteCoin(agent) {
+      var body = JSON.parse(JSON.stringify(request.body));
+      let deleteCoin = body.originalDetectIntentRequest.payload.data.postback.payload.slice(
+        7
+      );
+      const refDB = db.collection("users").doc("bb1SMPu9BnxZemoxEzHd");
+      return refDB.get().then((user) => {
+        try {
+          const { favoriteCoins } = user.data();
+          const deleteCoinIndex = favoriteCoins.find(
+            (coin) => coin == deleteCoin
+          );
+          if (deleteCoinIndex) {
+            favoriteCoins.splice(deleteCoinIndex, 1);
+            return refDB
+              .set({
+                favoriteCoins: favoriteCoins,
+                id: 2640677152657766,
+              })
+              .then(() => {
+                agent.add(`คุณได้ยกเลิกการติดตามเหรียญ ${deleteCoin}`);
+              });
+          } else {
+            agent.add("คุณยังไม่ได้ติดตามเหรียญนี้");
+          }
+        } catch (error) {
+          agent.add("ไม่พบเหรียญที่ต้องการยกเลิกการติดตาม");
+        }
+      });
+    }
+
     async function saveFavorite(agent, curreny) {
       return db
         .collection("users")
@@ -71,10 +102,13 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
         .then((user) => {
           try {
             const { favoriteCoins } = user.data();
-            if (favoriteCoins.find((coin) => coin == curreny)) {
+            if (favoriteCoins.length >= 3) {
+              agent.add(
+                "คุณได้ติดตามเหรียญครบ 3 เหรียญแล้ว ไม่สามารถติดตามเพิ่มได้อีก"
+              );
+            } else if (favoriteCoins.find((coin) => coin == curreny)) {
               agent.add("คุณได้ติดตามเหรียญนี้แล้ว");
             } else {
-              console.log(favoriteCoins);
               favoriteCoins.push(curreny);
               return db
                 .collection("users")
@@ -287,7 +321,6 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
       try {
         return db
           .collection("news")
-          .limit(5)
           .get()
           .then((result) => {
             let getNewsResult = [];
@@ -398,6 +431,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
     intentMap.set("PriceBNB", binancecoinprice);
     intentMap.set("Select", select);
     intentMap.set("ติดตาม", showMyFavorite);
+    intentMap.set("DeleteCoin", deletFavoriteCoin);
     intentMap.set("เหรียญของฉัน", showMyFavorite);
     // intentMap.set('your intent name here', yourFunctionHandler);
     // intentMap.set('your intent name here', googleAssistantHandler);
