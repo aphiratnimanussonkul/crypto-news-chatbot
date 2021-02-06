@@ -102,12 +102,12 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest(
         .then((user) => {
           try {
             const { favoriteCoins } = user.data();
-            if (favoriteCoins.length >= 3) {
+            if (favoriteCoins.find((coin) => coin == curreny)) {
+              agent.add("คุณได้ติดตามเหรียญนี้แล้ว");
+            } else if (favoriteCoins.length >= 3) {
               agent.add(
                 "คุณได้ติดตามเหรียญครบ 3 เหรียญแล้ว ไม่สามารถติดตามเพิ่มได้อีก"
               );
-            } else if (favoriteCoins.find((coin) => coin == curreny)) {
-              agent.add("คุณได้ติดตามเหรียญนี้แล้ว");
             } else {
               favoriteCoins.push(curreny);
               return db
