@@ -5,4 +5,5 @@ export interface News {
   url: string;
   id: number;
   currencies?: Currency[];
+  created_at?: string;
 }
